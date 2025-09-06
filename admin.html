@@ -1118,8 +1118,104 @@
             const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
             const item = portfolioItems.find(item => item.id === id);
             if (item) {
-                alert(`"${item.title}" をヒーロー動画として設定しました。\n※実際の実装では、この機能でindex.htmlが自動更新されます。`);
+                // 現在のヒーロー動画設定を更新
+                const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+                settings.heroVideo = item.filename;
+                settings.heroVideoTitle = item.title;
+                localStorage.setItem('siteSettings', JSON.stringify(settings));
+                
+                // HTML生成モーダルを表示
+                showHtmlUpdateModal(item);
             }
+        }
+
+        // HTML更新用のモーダルを表示
+        function showHtmlUpdateModal(item) {
+            const modal = document.createElement('div');
+            modal.className = 'password-setup-modal';
+            modal.innerHTML = `
+                <div class="password-setup-content">
+                    <h3>🎬 ヒーロー動画の更新</h3>
+                    <p style="color: #ccc; margin-bottom: 20px;">"${item.title}" をヒーロー動画として設定します</p>
+                    
+                    <div style="background: #333; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h4 style="color: #d2691e; margin-bottom: 10px;">実装手順:</h4>
+                        <ol style="color: #ccc; line-height: 1.6;">
+                            <li>動画ファイル "${item.filename}" を videos/ フォルダにアップロード</li>
+                            <li>以下のHTMLコードをindex.htmlに貼り付け</li>
+                        </ol>
+                    </div>
+
+                    <div style="background: #222; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h4 style="color: #d2691e; margin-bottom: 10px;">HTMLコード:</h4>
+                        <textarea readonly style="width: 100%; height: 80px; background: #111; color: #0f0; font-family: monospace; border: 1px solid #555; padding: 10px;">
+&lt;source src="videos/${item.filename}" type="video/mp4"&gt;</textarea>
+                    </div>
+
+                    <div style="background: #1a472a; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #4caf50;">
+                        <p style="color: #ccc; margin: 0;">ファイルをアップロードしたら、自動的にサイトに反映されます。</p>
+                    </div>
+
+                    <button class="login-button" onclick="generatePortfolioCode('${item.id}')">ポートフォリオ用コードも生成</button>
+                    <button class="btn btn-delete" onclick="this.parentElement.parentElement.remove()">閉じる</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // ポートフォリオ用HTMLコードを生成
+        function generatePortfolioCode(itemId) {
+            const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
+            const item = portfolioItems.find(item => item.id == itemId);
+            
+            if (!item) return;
+
+            const portfolioHtml = `
+        <div class="portfolio-item fade-in">
+            <div class="portfolio-video-container">
+                <video class="portfolio-video" controls poster="">
+                    <source src="videos/${item.filename}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="portfolio-overlay">
+                <h3>${item.title}</h3>
+                <p>${item.description}</p>
+            </div>
+        </div>`;
+
+            const modal = document.createElement('div');
+            modal.className = 'password-setup-modal';
+            modal.innerHTML = `
+                <div class="password-setup-content" style="max-width: 700px;">
+                    <h3>📋 ポートフォリオ用HTMLコード</h3>
+                    <p style="color: #ccc; margin-bottom: 20px;">"${item.title}" をポートフォリオセクションに追加</p>
+                    
+                    <textarea readonly style="width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; border: 1px solid #555; padding: 10px; font-size: 12px;">${portfolioHtml}</textarea>
+                    
+                    <div style="margin: 15px 0;">
+                        <button class="upload-button" onclick="copyToClipboard(this.previousElementSibling.value)">コードをコピー</button>
+                        <button class="btn btn-delete" onclick="this.parentElement.parentElement.parentElement.remove()">閉じる</button>
+                    </div>
+                    
+                    <div style="background: #333; padding: 15px; border-radius: 5px; font-size: 14px; color: #ccc;">
+                        <strong>追加方法:</strong><br>
+                        1. index.htmlのポートフォリオセクションを見つける<br>
+                        2. &lt;div class="portfolio-grid"&gt; の中に上記コードを貼り付け<br>
+                        3. ファイルを保存してサイトを更新
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // クリップボードにコピー
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('コードがクリップボードにコピーされました！');
+            }).catch(() => {
+                alert('コピーに失敗しました。手動でコピーしてください。');
+            });
         }
 
         // 設定の保存
