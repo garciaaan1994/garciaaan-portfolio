@@ -76,7 +76,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            background: linear-gradient(135deg, #2c1810 0%, #8b4513 50%, #d2691e 100%);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -415,7 +415,7 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <video class="hero-video" autoplay muted loop playsinline>
+        <video class="hero-video" autoplay muted loop playsinline preload="auto" poster="">
             <source src="background-video.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -544,6 +544,31 @@
             } else {
                 header.style.background = 'white';
                 header.style.backdropFilter = 'none';
+            }
+        });
+
+        // Video autoplay handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('.hero-video');
+            if (video) {
+                video.addEventListener('loadeddata', function() {
+                    console.log('Video loaded successfully');
+                });
+                
+                video.addEventListener('error', function(e) {
+                    console.error('Video error:', e);
+                    // Hide video on error and show background fallback
+                    video.style.display = 'none';
+                });
+
+                // Force play attempt
+                video.play().catch(function(error) {
+                    console.log('Autoplay prevented:', error);
+                    // If autoplay fails, try again on user interaction
+                    document.addEventListener('click', function() {
+                        video.play().catch(e => console.log('Manual play failed:', e));
+                    }, { once: true });
+                });
             }
         });
     </script>
