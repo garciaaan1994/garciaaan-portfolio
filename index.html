@@ -123,6 +123,13 @@
             letter-spacing: 3px;
         }
 
+        .about-text p {
+            font-size: 16px;
+            line-height: 2;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
         .about-image {
             position: relative;
             overflow: hidden;
@@ -138,6 +145,65 @@
 
         .about-image:hover img {
             transform: scale(1.05);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 120px 0;
+            background: #f8f8f8;
+        }
+
+        .services h2 {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 100;
+            margin-bottom: 80px;
+            letter-spacing: 3px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 50px 30px;
+            text-align: center;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .service-card h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .service-card p {
+            color: #666;
+            line-height: 1.8;
         }
 
         /* Portfolio Section */
@@ -287,6 +353,7 @@
             }
 
             .about-text h2,
+            .services h2,
             .portfolio h2,
             .contact h2 {
                 font-size: 32px;
@@ -342,6 +409,7 @@
             </div>
         </div>
     </section>
+
 
     <!-- Portfolio Section -->
     <section class="portfolio" id="portfolio">
