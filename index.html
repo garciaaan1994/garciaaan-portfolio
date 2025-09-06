@@ -444,6 +444,9 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="">
+            <source src="horse-video.mp4" type="video/mp4">
+        </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>garciaaan</h1>
@@ -576,24 +579,43 @@
         document.addEventListener('DOMContentLoaded', function() {
             const video = document.querySelector('.hero-video');
             if (video) {
+                console.log('Video element found, attempting to load...');
+                
+                video.addEventListener('loadstart', function() {
+                    console.log('Video loading started');
+                });
+                
+                video.addEventListener('loadedmetadata', function() {
+                    console.log('Video metadata loaded');
+                });
+                
                 video.addEventListener('loadeddata', function() {
-                    console.log('Video loaded successfully');
+                    console.log('Video data loaded successfully');
+                    video.style.opacity = '1';
+                });
+                
+                video.addEventListener('canplay', function() {
+                    console.log('Video can start playing');
+                    video.play().then(() => {
+                        console.log('Video playing successfully');
+                    }).catch(function(error) {
+                        console.log('Autoplay prevented:', error);
+                        // Show play button or try again on user interaction
+                        document.addEventListener('click', function() {
+                            video.play().catch(e => console.log('Manual play failed:', e));
+                        }, { once: true });
+                    });
                 });
                 
                 video.addEventListener('error', function(e) {
                     console.error('Video error:', e);
-                    // Hide video on error and show background fallback
+                    console.log('Falling back to CSS background animation');
                     video.style.display = 'none';
                 });
 
-                // Force play attempt
-                video.play().catch(function(error) {
-                    console.log('Autoplay prevented:', error);
-                    // If autoplay fails, try again on user interaction
-                    document.addEventListener('click', function() {
-                        video.play().catch(e => console.log('Manual play failed:', e));
-                    }, { once: true });
-                });
+                // Set initial opacity to 0 until loaded
+                video.style.opacity = '0';
+                video.style.transition = 'opacity 1s ease-in-out';
             }
         });
     </script>
