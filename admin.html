@@ -280,6 +280,171 @@
             margin-bottom: 20px;
         }
 
+        /* Login Screen Styles */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-container {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #d2691e;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #888;
+        }
+
+        .login-form {
+            text-align: left;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d2691e;
+            font-weight: bold;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            border: 2px solid #555;
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #d2691e;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #d2691e, #daa520);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            background: linear-gradient(45deg, #b8581a, #b8941c);
+            transform: translateY(-2px);
+        }
+
+        .login-error {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f44336;
+            color: white;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .security-note {
+            margin-top: 25px;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+            border-left: 4px solid #d2691e;
+        }
+
+        .security-note p {
+            margin: 0;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .logout-button {
+            background: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: #d32f2f;
+        }
+
+        /* Password Setup Modal */
+        .password-setup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .password-setup-content {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #444;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .password-setup-content h3 {
+            color: #d2691e;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             .tabs {
                 flex-direction: column;
@@ -288,14 +453,56 @@
             .portfolio-grid {
                 grid-template-columns: 1fr;
             }
+
+            .login-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .password-setup-content {
+                margin: 20px;
+                padding: 30px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>garciaaan STUDIO</h1>
+                <h2>Admin Access</h2>
+                <p>管理者ログイン</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">ユーザー名:</label>
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">パスワード:</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-button">ログイン</button>
+                <div id="loginError" class="login-error"></div>
+            </form>
+            <div class="security-note">
+                <p>🔒 セキュリティ保護されたエリアです</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Interface (hidden by default) -->
+    <div id="adminInterface" class="container" style="display: none;">
         <div class="header">
-            <h1>Portfolio Admin</h1>
-            <p>動画作品の管理とアップロード</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Portfolio Admin</h1>
+                    <p>動画作品の管理とアップロード</p>
+                </div>
+                <button id="logoutButton" class="logout-button">ログアウト</button>
+            </div>
         </div>
 
         <div class="tabs">
@@ -375,10 +582,341 @@
                 </div>
                 <button class="upload-button" onclick="saveSettings()">設定を保存</button>
             </div>
+
+            <div class="settings-section">
+                <h3>セキュリティ設定</h3>
+                <div class="form-group">
+                    <label>管理者ユーザー名:</label>
+                    <input type="text" id="adminUsername" placeholder="現在のユーザー名">
+                </div>
+                <div class="form-group">
+                    <label>現在のパスワード:</label>
+                    <input type="password" id="currentPassword" placeholder="現在のパスワード">
+                </div>
+                <div class="form-group">
+                    <label>新しいパスワード:</label>
+                    <input type="password" id="newPassword" placeholder="新しいパスワード">
+                </div>
+                <div class="form-group">
+                    <label>新しいパスワード（確認）:</label>
+                    <input type="password" id="confirmPassword" placeholder="新しいパスワードを再入力">
+                </div>
+                <button class="upload-button" onclick="changePassword()">パスワードを変更</button>
+                <button class="btn btn-delete" onclick="resetCredentials()" style="margin-left: 10px;">認証をリセット</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>ログイン履歴</h3>
+                <div id="loginHistory" style="background: #333; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 0.9rem;">
+                    <!-- ログイン履歴がここに表示される -->
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        // === 認証システム ===
+        class AdminAuth {
+            constructor() {
+                this.sessionKey = 'admin_session';
+                this.credentialsKey = 'admin_credentials';
+                this.loginHistoryKey = 'admin_login_history';
+                this.sessionTimeout = 60 * 60 * 1000; // 1時間
+                
+                this.init();
+            }
+
+            init() {
+                // 初回アクセス時のデフォルト認証情報設定
+                if (!this.getCredentials()) {
+                    this.showPasswordSetup();
+                } else {
+                    this.checkSession();
+                }
+            }
+
+            // デフォルト認証情報の設定
+            showPasswordSetup() {
+                const modal = document.createElement('div');
+                modal.className = 'password-setup-modal';
+                modal.innerHTML = `
+                    <div class="password-setup-content">
+                        <h3>🔐 初回セットアップ</h3>
+                        <p style="color: #ccc; margin-bottom: 30px;">管理者アカウントの認証情報を設定してください</p>
+                        <div class="form-group">
+                            <label>管理者ユーザー名:</label>
+                            <input type="text" id="setupUsername" value="garciaaan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>パスワード:</label>
+                            <input type="password" id="setupPassword" placeholder="強力なパスワードを入力" required>
+                        </div>
+                        <div class="form-group">
+                            <label>パスワード（確認）:</label>
+                            <input type="password" id="setupConfirmPassword" placeholder="パスワードを再入力" required>
+                        </div>
+                        <button class="login-button" onclick="adminAuth.setupCredentials()">認証情報を設定</button>
+                        <div id="setupError" class="login-error"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            setupCredentials() {
+                const username = document.getElementById('setupUsername').value;
+                const password = document.getElementById('setupPassword').value;
+                const confirmPassword = document.getElementById('setupConfirmPassword').value;
+                const errorDiv = document.getElementById('setupError');
+
+                if (!username || !password) {
+                    this.showError(errorDiv, 'ユーザー名とパスワードを入力してください');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showError(errorDiv, 'パスワードは6文字以上で設定してください');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showError(errorDiv, 'パスワードが一致しません');
+                    return;
+                }
+
+                // パスワードをハッシュ化（簡易版）
+                const hashedPassword = this.simpleHash(password);
+                
+                const credentials = {
+                    username: username,
+                    password: hashedPassword,
+                    createdAt: new Date().toISOString()
+                };
+
+                localStorage.setItem(this.credentialsKey, JSON.stringify(credentials));
+                
+                // セットアップモーダルを削除
+                document.querySelector('.password-setup-modal').remove();
+                
+                // ログイン画面を表示
+                this.checkSession();
+                
+                alert('認証情報が設定されました！\nユーザー名: ' + username);
+            }
+
+            // セッション確認
+            checkSession() {
+                const session = this.getSession();
+                if (session && this.isSessionValid(session)) {
+                    this.showAdminInterface();
+                } else {
+                    this.showLoginScreen();
+                }
+            }
+
+            // ログイン処理
+            login(username, password) {
+                const credentials = this.getCredentials();
+                if (!credentials) {
+                    return { success: false, message: '認証情報が設定されていません' };
+                }
+
+                const hashedPassword = this.simpleHash(password);
+                
+                if (username === credentials.username && hashedPassword === credentials.password) {
+                    const session = {
+                        username: username,
+                        loginTime: Date.now(),
+                        expiresAt: Date.now() + this.sessionTimeout
+                    };
+                    
+                    localStorage.setItem(this.sessionKey, JSON.stringify(session));
+                    this.logLoginHistory(username, true);
+                    
+                    return { success: true };
+                } else {
+                    this.logLoginHistory(username, false);
+                    return { success: false, message: 'ユーザー名またはパスワードが正しくありません' };
+                }
+            }
+
+            // ログアウト
+            logout() {
+                localStorage.removeItem(this.sessionKey);
+                this.showLoginScreen();
+            }
+
+            // パスワード変更
+            changePassword(currentPassword, newPassword, confirmPassword) {
+                const credentials = this.getCredentials();
+                const hashedCurrentPassword = this.simpleHash(currentPassword);
+
+                if (hashedCurrentPassword !== credentials.password) {
+                    return { success: false, message: '現在のパスワードが正しくありません' };
+                }
+
+                if (newPassword.length < 6) {
+                    return { success: false, message: '新しいパスワードは6文字以上で設定してください' };
+                }
+
+                if (newPassword !== confirmPassword) {
+                    return { success: false, message: '新しいパスワードが一致しません' };
+                }
+
+                credentials.password = this.simpleHash(newPassword);
+                credentials.updatedAt = new Date().toISOString();
+                
+                localStorage.setItem(this.credentialsKey, JSON.stringify(credentials));
+                
+                return { success: true, message: 'パスワードが変更されました' };
+            }
+
+            // ログイン履歴
+            logLoginHistory(username, success) {
+                const history = JSON.parse(localStorage.getItem(this.loginHistoryKey) || '[]');
+                
+                history.unshift({
+                    username: username,
+                    success: success,
+                    timestamp: new Date().toISOString(),
+                    ip: 'localhost' // 実際の実装では実IPを取得
+                });
+
+                // 最新50件まで保持
+                if (history.length > 50) {
+                    history.splice(50);
+                }
+
+                localStorage.setItem(this.loginHistoryKey, JSON.stringify(history));
+            }
+
+            // 画面表示制御
+            showLoginScreen() {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('adminInterface').style.display = 'none';
+            }
+
+            showAdminInterface() {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminInterface').style.display = 'block';
+                this.loadLoginHistory();
+                this.loadSecuritySettings();
+            }
+
+            // ヘルパー関数
+            getCredentials() {
+                return JSON.parse(localStorage.getItem(this.credentialsKey) || 'null');
+            }
+
+            getSession() {
+                return JSON.parse(localStorage.getItem(this.sessionKey) || 'null');
+            }
+
+            isSessionValid(session) {
+                return session && Date.now() < session.expiresAt;
+            }
+
+            simpleHash(password) {
+                // 簡易ハッシュ関数（実際の実装ではより強力な暗号化を使用）
+                let hash = 0;
+                for (let i = 0; i < password.length; i++) {
+                    const char = password.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // 32bit整数に変換
+                }
+                return hash.toString();
+            }
+
+            showError(element, message) {
+                element.textContent = message;
+                element.style.display = 'block';
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+
+            loadLoginHistory() {
+                const history = JSON.parse(localStorage.getItem(this.loginHistoryKey) || '[]');
+                const historyDiv = document.getElementById('loginHistory');
+                
+                if (history.length === 0) {
+                    historyDiv.innerHTML = 'ログイン履歴がありません';
+                    return;
+                }
+
+                historyDiv.innerHTML = history.slice(0, 10).map(entry => {
+                    const date = new Date(entry.timestamp).toLocaleString('ja-JP');
+                    const status = entry.success ? '✅ 成功' : '❌ 失敗';
+                    return `${date} - ${entry.username} - ${status}`;
+                }).join('\n');
+            }
+
+            loadSecuritySettings() {
+                const credentials = this.getCredentials();
+                if (credentials) {
+                    document.getElementById('adminUsername').value = credentials.username;
+                }
+            }
+
+            resetCredentials() {
+                if (confirm('認証情報をリセットしますか？\n※この操作により新しいパスワードの設定が必要になります')) {
+                    localStorage.removeItem(this.credentialsKey);
+                    localStorage.removeItem(this.sessionKey);
+                    localStorage.removeItem(this.loginHistoryKey);
+                    location.reload();
+                }
+            }
+        }
+
+        // グローバルインスタンス
+        const adminAuth = new AdminAuth();
+
+        // ログインフォーム処理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            const result = adminAuth.login(username, password);
+            
+            if (result.success) {
+                adminAuth.showAdminInterface();
+            } else {
+                adminAuth.showError(errorDiv, result.message);
+            }
+        });
+
+        // ログアウトボタン
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            if (confirm('ログアウトしますか？')) {
+                adminAuth.logout();
+            }
+        });
+
+        // パスワード変更
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            const result = adminAuth.changePassword(currentPassword, newPassword, confirmPassword);
+            
+            if (result.success) {
+                alert(result.message);
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            } else {
+                alert('エラー: ' + result.message);
+            }
+        }
+
+        // 認証リセット
+        function resetCredentials() {
+            adminAuth.resetCredentials();
+        }
+
         // タブ切り替え
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(content => {
