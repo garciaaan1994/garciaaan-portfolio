@@ -76,9 +76,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(45deg, #2c1810, #8b4513, #d2691e, #daa520, #8b4513, #2c1810);
-            background-size: 400% 400%;
-            animation: desertWave 15s ease-in-out infinite;
+            background: #2c1810;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -113,15 +111,13 @@
 
         .hero-video {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -1;
-            transform: translateX(-50%) translateY(-50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
             object-fit: cover;
+            pointer-events: none;
         }
 
         .hero-overlay {
@@ -130,13 +126,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2;
         }
 
         .hero-content {
             position: relative;
-            z-index: 1;
+            z-index: 3;
         }
 
         .hero-content h1 {
@@ -592,6 +588,12 @@
                 video.addEventListener('loadeddata', function() {
                     console.log('Video data loaded successfully');
                     video.style.opacity = '1';
+                    // Hide CSS background animation when video loads
+                    const hero = document.querySelector('.hero');
+                    if (hero) {
+                        hero.style.background = 'transparent';
+                        hero.style.animation = 'none';
+                    }
                 });
                 
                 video.addEventListener('canplay', function() {
