@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Admin - garciaaan STUDIO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'OCR A Extended', 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #d2691e;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #d2691e;
+            border-bottom: 2px solid #d2691e;
+        }
+
+        .tab:hover {
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-section {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px dashed #555;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #d2691e;
+        }
+
+        .upload-section.drag-over {
+            border-color: #d2691e;
+            background: #333;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: #d2691e;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .upload-button:hover {
+            background: #b8581a;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .portfolio-item {
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .portfolio-video {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .portfolio-info {
+            padding: 20px;
+        }
+
+        .portfolio-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #d2691e;
+        }
+
+        .portfolio-description {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .portfolio-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-use {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #d2691e;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d2691e, #daa520);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .status-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-error {
+            background: #f44336;
+            color: white;
+        }
+
+        .video-preview {
+            max-width: 300px;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .video-preview video {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .settings-section {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .settings-section h3 {
+            color: #d2691e;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Portfolio Admin</h1>
+            <p>動画作品の管理とアップロード</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('upload')">アップロード</button>
+            <button class="tab" onclick="showTab('manage')">作品管理</button>
+            <button class="tab" onclick="showTab('settings')">設定</button>
+        </div>
+
+        <!-- Upload Tab -->
+        <div id="upload" class="tab-content active">
+            <div class="upload-section" id="uploadArea">
+                <h3>動画ファイルをアップロード</h3>
+                <p>ドラッグ&ドロップまたはクリックしてファイルを選択</p>
+                <input type="file" id="fileInput" class="file-input" accept="video/*" multiple>
+                <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                    ファイルを選択
+                </button>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <h4>ファイル情報</h4>
+                <div class="form-group">
+                    <label>タイトル:</label>
+                    <input type="text" id="videoTitle" placeholder="作品のタイトル">
+                </div>
+                <div class="form-group">
+                    <label>説明:</label>
+                    <textarea id="videoDescription" placeholder="作品の説明"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>カテゴリ:</label>
+                    <select id="videoCategory" style="width: 100%; padding: 10px; background: #333; border: 1px solid #555; border-radius: 4px; color: #fff;">
+                        <option value="hero">ヒーロー背景</option>
+                        <option value="portfolio">ポートフォリオ作品</option>
+                        <option value="about">アバウトセクション</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                <div class="video-preview" id="videoPreview">
+                    <video controls id="previewVideo"></video>
+                </div>
+                <button class="upload-button" onclick="saveVideoInfo()">保存</button>
+            </div>
+        </div>
+
+        <!-- Manage Tab -->
+        <div id="manage" class="tab-content">
+            <h3>アップロード済み作品</h3>
+            <div class="portfolio-grid" id="portfolioGrid">
+                <!-- 動的にコンテンツが追加される -->
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="settings-section">
+                <h3>サイト設定</h3>
+                <div class="form-group">
+                    <label>サイトタイトル:</label>
+                    <input type="text" id="siteTitle" value="garciaaan STUDIO">
+                </div>
+                <div class="form-group">
+                    <label>キャッチフレーズ:</label>
+                    <textarea id="siteCatchphrase">With a product manager's vision and AI's imagination, we craft art pieces that merge human sensitivity with machine intelligence.</textarea>
+                </div>
+                <div class="form-group">
+                    <label>現在のヒーロー動画:</label>
+                    <select id="heroVideoSelect">
+                        <option value="horse-video.mp4">砂漠の馬</option>
+                    </select>
+                </div>
+                <button class="upload-button" onclick="saveSettings()">設定を保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タブ切り替え
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'manage') {
+                loadPortfolioItems();
+            }
+        }
+
+        // ドラッグ&ドロップ機能
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // ファイル処理
+        function handleFiles(files) {
+            if (files.length === 0) return;
+
+            const file = files[0];
+            if (!file.type.startsWith('video/')) {
+                showStatus('動画ファイルを選択してください', 'error');
+                return;
+            }
+
+            // ファイル情報を表示
+            document.getElementById('fileInfo').style.display = 'block';
+            document.getElementById('videoTitle').value = file.name.replace(/\.[^/.]+$/, "");
+            
+            // プレビューを表示
+            const videoPreview = document.getElementById('videoPreview');
+            const previewVideo = document.getElementById('previewVideo');
+            
+            const fileURL = URL.createObjectURL(file);
+            previewVideo.src = fileURL;
+            videoPreview.style.display = 'block';
+
+            // ファイルをメモリに保存（実際の実装では別の方法を使用）
+            window.currentFile = file;
+        }
+
+        // 動画情報の保存
+        function saveVideoInfo() {
+            const title = document.getElementById('videoTitle').value;
+            const description = document.getElementById('videoDescription').value;
+            const category = document.getElementById('videoCategory').value;
+
+            if (!title || !window.currentFile) {
+                showStatus('タイトルとファイルが必要です', 'error');
+                return;
+            }
+
+            // プログレスバーを表示
+            document.getElementById('progressBar').style.display = 'block';
+            simulateUpload(title, description, category);
+        }
+
+        // アップロードのシミュレーション
+        function simulateUpload(title, description, category) {
+            const progressFill = document.getElementById('progressFill');
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // ローカルストレージに保存
+                    saveToLocalStorage(title, description, category);
+                    showStatus('アップロードが完了しました！', 'success');
+                    resetForm();
+                }
+                progressFill.style.width = progress + '%';
+            }, 200);
+        }
+
+        // ローカルストレージに保存
+        function saveToLocalStorage(title, description, category) {
+            const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
+            
+            const newItem = {
+                id: Date.now(),
+                title: title,
+                description: description,
+                category: category,
+                filename: window.currentFile.name,
+                uploadDate: new Date().toISOString(),
+                size: window.currentFile.size
+            };
+
+            portfolioItems.push(newItem);
+            localStorage.setItem('portfolioItems', JSON.stringify(portfolioItems));
+        }
+
+        // ポートフォリオアイテムの読み込み
+        function loadPortfolioItems() {
+            const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
+            const grid = document.getElementById('portfolioGrid');
+            
+            if (portfolioItems.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">まだ作品がアップロードされていません</p>';
+                return;
+            }
+
+            grid.innerHTML = portfolioItems.map(item => `
+                <div class="portfolio-item">
+                    <div style="height: 200px; background: #333; display: flex; align-items: center; justify-content: center; color: #888;">
+                        <p>動画プレビュー<br>${item.filename}</p>
+                    </div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">${item.title}</div>
+                        <div class="portfolio-description">${item.description}</div>
+                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">
+                            カテゴリ: ${item.category} | サイズ: ${formatFileSize(item.size)}
+                        </div>
+                        <div class="portfolio-actions">
+                            <button class="btn btn-edit" onclick="editItem(${item.id})">編集</button>
+                            <button class="btn btn-use" onclick="useAsHero(${item.id})">ヒーローに使用</button>
+                            <button class="btn btn-delete" onclick="deleteItem(${item.id})">削除</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ファイルサイズのフォーマット
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // ステータスメッセージの表示
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = `status-message status-${type}`;
+            statusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // フォームのリセット
+        function resetForm() {
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('videoPreview').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoDescription').value = '';
+            window.currentFile = null;
+        }
+
+        // アイテムの削除
+        function deleteItem(id) {
+            if (confirm('この作品を削除しますか？')) {
+                const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
+                const filteredItems = portfolioItems.filter(item => item.id !== id);
+                localStorage.setItem('portfolioItems', JSON.stringify(filteredItems));
+                loadPortfolioItems();
+                showStatus('作品を削除しました', 'success');
+            }
+        }
+
+        // ヒーロー動画として使用
+        function useAsHero(id) {
+            const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
+            const item = portfolioItems.find(item => item.id === id);
+            if (item) {
+                alert(`"${item.title}" をヒーロー動画として設定しました。\n※実際の実装では、この機能でindex.htmlが自動更新されます。`);
+            }
+        }
+
+        // 設定の保存
+        function saveSettings() {
+            const settings = {
+                siteTitle: document.getElementById('siteTitle').value,
+                siteCatchphrase: document.getElementById('siteCatchphrase').value,
+                heroVideo: document.getElementById('heroVideoSelect').value
+            };
+            
+            localStorage.setItem('siteSettings', JSON.stringify(settings));
+            showStatus('設定を保存しました', 'success');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 保存された設定を読み込み
+            const settings = JSON.parse(localStorage.getItem('siteSettings') || '{}');
+            if (settings.siteTitle) {
+                document.getElementById('siteTitle').value = settings.siteTitle;
+            }
+            if (settings.siteCatchphrase) {
+                document.getElementById('siteCatchphrase').value = settings.siteCatchphrase;
+            }
+        });
+    </script>
+</body>
+</html>
