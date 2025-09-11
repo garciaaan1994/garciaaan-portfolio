@@ -10,10 +10,14 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
+        html {
+            background-color: #000; /* Black background to see graphics clearly */
+        }
 
         body {
             font-family: 'OCR A Extended', 'Courier New', monospace;
-            background-color: #f8f8f8;
+            background-color: transparent; /* Transparent for graphics testing */
             color: #333;
             line-height: 1.6;
             overflow-x: hidden;
@@ -76,7 +80,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #2c1810;
+            background: transparent; /* No background to see graphics clearly */
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -250,7 +254,7 @@
             font-weight: 100;
             letter-spacing: 10px;
             margin-bottom: 30px;
-            color: #fff;
+            color: #d2691e; /* Desert orange for visibility */
             opacity: 0;
             animation: fadeInUp 1s ease 0.5s forwards;
             font-family: 'OCR A Extended', 'Courier New', monospace;
@@ -594,9 +598,10 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="">
+        <!-- Temporarily hidden for testing interactive graphics -->
+        <!-- <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="">
             <source src="videos/horse-video.mp4" type="video/mp4">
-        </video>
+        </video> -->
         
         <!-- Interactive Graphics Layer -->
         <div class="geometric-shapes">
@@ -819,12 +824,20 @@
                 }
 
                 init() {
-                    if (!this.neuralCanvas || !this.connectionCanvas) return;
+                    if (!this.neuralCanvas || !this.connectionCanvas) {
+                        console.error('Canvas elements not found:', {
+                            neural: this.neuralCanvas,
+                            connection: this.connectionCanvas
+                        });
+                        return;
+                    }
                     
+                    console.log('Canvas elements found, setting up...');
                     this.setupCanvas();
                     this.createParticles();
                     this.bindEvents();
                     this.animate();
+                    console.log('Interactive graphics setup complete');
                 }
 
                 setupCanvas() {
@@ -847,11 +860,11 @@
                         this.particles.push({
                             x: Math.random() * window.innerWidth,
                             y: Math.random() * window.innerHeight,
-                            vx: (Math.random() - 0.5) * 0.3,
-                            vy: (Math.random() - 0.5) * 0.3,
-                            size: Math.random() * 2 + 1,
-                            opacity: Math.random() * 0.3 + 0.1,
-                            color: `rgba(210, 105, 30, ${Math.random() * 0.5 + 0.2})`
+                            vx: (Math.random() - 0.5) * 0.8,
+                            vy: (Math.random() - 0.5) * 0.8,
+                            size: Math.random() * 4 + 3,
+                            opacity: Math.random() * 0.8 + 0.3,
+                            color: `rgba(255, 215, 0, ${Math.random() * 0.8 + 0.4})` // Bright gold
                         });
                     }
                 }
@@ -881,12 +894,12 @@
                             const dy = this.particles[i].y - this.particles[j].y;
                             const distance = Math.sqrt(dx * dx + dy * dy);
                             
-                            if (distance < 120) {
+                            if (distance < 150) {
                                 this.connectionCtx.beginPath();
                                 this.connectionCtx.moveTo(this.particles[i].x, this.particles[i].y);
                                 this.connectionCtx.lineTo(this.particles[j].x, this.particles[j].y);
-                                this.connectionCtx.strokeStyle = `rgba(210, 105, 30, ${0.15 * (1 - distance / 120)})`;
-                                this.connectionCtx.lineWidth = 1;
+                                this.connectionCtx.strokeStyle = `rgba(255, 215, 0, ${0.6 * (1 - distance / 150)})`;
+                                this.connectionCtx.lineWidth = 2;
                                 this.connectionCtx.stroke();
                             }
                         }
@@ -898,12 +911,12 @@
                         const dy = particle.y - this.mouseY;
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         
-                        if (distance < 80) {
+                        if (distance < 120) {
                             this.connectionCtx.beginPath();
                             this.connectionCtx.moveTo(particle.x, particle.y);
                             this.connectionCtx.lineTo(this.mouseX, this.mouseY);
-                            this.connectionCtx.strokeStyle = `rgba(218, 165, 32, ${0.4 * (1 - distance / 80)})`;
-                            this.connectionCtx.lineWidth = 1.5;
+                            this.connectionCtx.strokeStyle = `rgba(255, 255, 255, ${0.8 * (1 - distance / 120)})`;
+                            this.connectionCtx.lineWidth = 3;
                             this.connectionCtx.stroke();
                         }
                     });
