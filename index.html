@@ -135,6 +135,112 @@
             z-index: 3;
         }
 
+        /* Interactive Graphics */
+        .interactive-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .neural-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        /* Floating geometric shapes */
+        .geometric-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.05;
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #d2691e, transparent);
+            border-radius: 50%;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, transparent, #daa520);
+            border-radius: 20%;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #8b4513, transparent);
+            border-radius: 30%;
+            top: 80%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+
+        .shape:nth-child(4) {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, transparent, #d2691e);
+            border-radius: 50%;
+            top: 30%;
+            left: 70%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+                opacity: 0.05;
+            }
+            25% {
+                transform: translateY(-30px) rotate(90deg) scale(1.1);
+                opacity: 0.1;
+            }
+            50% {
+                transform: translateY(-60px) rotate(180deg) scale(0.9);
+                opacity: 0.05;
+            }
+            75% {
+                transform: translateY(-30px) rotate(270deg) scale(1.05);
+                opacity: 0.08;
+            }
+            100% {
+                transform: translateY(0px) rotate(360deg) scale(1);
+                opacity: 0.05;
+            }
+        }
+
+        /* Interactive lines */
+        .connection-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.1;
+        }
+
         .hero-content h1 {
             font-size: clamp(3rem, 8vw, 8rem);
             font-weight: 100;
@@ -487,6 +593,21 @@
         <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="">
             <source src="videos/horse-video.mp4" type="video/mp4">
         </video>
+        
+        <!-- Interactive Graphics Layer -->
+        <div class="geometric-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+        
+        <!-- Neural Network Canvas -->
+        <canvas class="neural-network" id="neuralCanvas"></canvas>
+        
+        <!-- Connection Lines -->
+        <canvas class="connection-lines" id="connectionCanvas"></canvas>
+        
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>garciaaan</h1>
@@ -680,6 +801,170 @@
                 video.style.opacity = '0';
                 video.style.transition = 'opacity 1s ease-in-out';
             }
+
+            // === Interactive Graphics System ===
+            class InteractiveGraphics {
+                constructor() {
+                    this.neuralCanvas = document.getElementById('neuralCanvas');
+                    this.connectionCanvas = document.getElementById('connectionCanvas');
+                    this.mouseX = window.innerWidth / 2;
+                    this.mouseY = window.innerHeight / 2;
+                    this.particles = [];
+                    
+                    this.init();
+                }
+
+                init() {
+                    if (!this.neuralCanvas || !this.connectionCanvas) return;
+                    
+                    this.setupCanvas();
+                    this.createParticles();
+                    this.bindEvents();
+                    this.animate();
+                }
+
+                setupCanvas() {
+                    // Neural network canvas setup
+                    this.neuralCanvas.width = window.innerWidth;
+                    this.neuralCanvas.height = window.innerHeight;
+                    this.neuralCtx = this.neuralCanvas.getContext('2d');
+                    
+                    // Connection lines canvas setup
+                    this.connectionCanvas.width = window.innerWidth;
+                    this.connectionCanvas.height = window.innerHeight;
+                    this.connectionCtx = this.connectionCanvas.getContext('2d');
+                }
+
+                createParticles() {
+                    const particleCount = 40;
+                    this.particles = [];
+                    
+                    for (let i = 0; i < particleCount; i++) {
+                        this.particles.push({
+                            x: Math.random() * window.innerWidth,
+                            y: Math.random() * window.innerHeight,
+                            vx: (Math.random() - 0.5) * 0.3,
+                            vy: (Math.random() - 0.5) * 0.3,
+                            size: Math.random() * 2 + 1,
+                            opacity: Math.random() * 0.3 + 0.1,
+                            color: `rgba(210, 105, 30, ${Math.random() * 0.5 + 0.2})`
+                        });
+                    }
+                }
+
+                drawNeuralNetwork() {
+                    this.neuralCtx.clearRect(0, 0, this.neuralCanvas.width, this.neuralCanvas.height);
+                    
+                    // Draw particles
+                    this.particles.forEach(particle => {
+                        this.neuralCtx.beginPath();
+                        this.neuralCtx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                        this.neuralCtx.fillStyle = particle.color;
+                        this.neuralCtx.globalAlpha = particle.opacity;
+                        this.neuralCtx.fill();
+                    });
+                    
+                    this.neuralCtx.globalAlpha = 1;
+                }
+
+                drawConnections() {
+                    this.connectionCtx.clearRect(0, 0, this.connectionCanvas.width, this.connectionCanvas.height);
+                    
+                    // Draw connections between nearby particles
+                    for (let i = 0; i < this.particles.length; i++) {
+                        for (let j = i + 1; j < this.particles.length; j++) {
+                            const dx = this.particles[i].x - this.particles[j].x;
+                            const dy = this.particles[i].y - this.particles[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance < 120) {
+                                this.connectionCtx.beginPath();
+                                this.connectionCtx.moveTo(this.particles[i].x, this.particles[i].y);
+                                this.connectionCtx.lineTo(this.particles[j].x, this.particles[j].y);
+                                this.connectionCtx.strokeStyle = `rgba(210, 105, 30, ${0.15 * (1 - distance / 120)})`;
+                                this.connectionCtx.lineWidth = 1;
+                                this.connectionCtx.stroke();
+                            }
+                        }
+                    }
+
+                    // Draw connections to mouse
+                    this.particles.forEach(particle => {
+                        const dx = particle.x - this.mouseX;
+                        const dy = particle.y - this.mouseY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 80) {
+                            this.connectionCtx.beginPath();
+                            this.connectionCtx.moveTo(particle.x, particle.y);
+                            this.connectionCtx.lineTo(this.mouseX, this.mouseY);
+                            this.connectionCtx.strokeStyle = `rgba(218, 165, 32, ${0.4 * (1 - distance / 80)})`;
+                            this.connectionCtx.lineWidth = 1.5;
+                            this.connectionCtx.stroke();
+                        }
+                    });
+                }
+
+                updateParticles() {
+                    this.particles.forEach(particle => {
+                        // Update position
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        
+                        // Bounce off edges
+                        if (particle.x < 0 || particle.x > window.innerWidth) {
+                            particle.vx *= -1;
+                        }
+                        if (particle.y < 0 || particle.y > window.innerHeight) {
+                            particle.vy *= -1;
+                        }
+                        
+                        // Keep particles in bounds
+                        particle.x = Math.max(0, Math.min(window.innerWidth, particle.x));
+                        particle.y = Math.max(0, Math.min(window.innerHeight, particle.y));
+                        
+                        // Subtle attraction to mouse
+                        const dx = this.mouseX - particle.x;
+                        const dy = this.mouseY - particle.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 150 && distance > 0) {
+                            const force = (150 - distance) / 150 * 0.0008;
+                            particle.vx += dx * force;
+                            particle.vy += dy * force;
+                        }
+                        
+                        // Limit velocity
+                        const maxSpeed = 0.8;
+                        const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+                        if (speed > maxSpeed) {
+                            particle.vx = (particle.vx / speed) * maxSpeed;
+                            particle.vy = (particle.vy / speed) * maxSpeed;
+                        }
+                    });
+                }
+
+                bindEvents() {
+                    document.addEventListener('mousemove', (e) => {
+                        this.mouseX = e.clientX;
+                        this.mouseY = e.clientY;
+                    });
+
+                    window.addEventListener('resize', () => {
+                        this.setupCanvas();
+                    });
+                }
+
+                animate() {
+                    this.updateParticles();
+                    this.drawNeuralNetwork();
+                    this.drawConnections();
+                    requestAnimationFrame(() => this.animate());
+                }
+            }
+
+            // Initialize interactive graphics
+            new InteractiveGraphics();
         });
     </script>
 </body>
