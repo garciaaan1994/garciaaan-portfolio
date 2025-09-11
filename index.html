@@ -815,12 +815,22 @@
                 }
 
                 init() {
-                    if (!this.neuralCanvas || !this.connectionCanvas) return;
+                    console.log('Canvas elements found:', {
+                        neuralCanvas: !!this.neuralCanvas,
+                        connectionCanvas: !!this.connectionCanvas
+                    });
                     
+                    if (!this.neuralCanvas || !this.connectionCanvas) {
+                        console.error('Canvas elements not found!');
+                        return;
+                    }
+                    
+                    console.log('Setting up Interactive Graphics...');
                     this.setupCanvas();
                     this.createParticles();
                     this.bindEvents();
                     this.animate();
+                    console.log('Interactive Graphics setup complete!');
                 }
 
                 setupCanvas() {
@@ -963,8 +973,14 @@
                 }
             }
 
-            // Initialize interactive graphics
-            new InteractiveGraphics();
+            // Initialize interactive graphics with debug
+            console.log('Initializing Interactive Graphics...');
+            try {
+                const graphics = new InteractiveGraphics();
+                console.log('Interactive Graphics initialized successfully!');
+            } catch (error) {
+                console.error('Failed to initialize Interactive Graphics:', error);
+            }
         });
     </script>
 </body>
