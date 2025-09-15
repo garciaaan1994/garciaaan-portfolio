@@ -614,6 +614,10 @@
         </div>
     </div>
 
+    <!-- Supabase CDN + config (存在しない場合は自動フォールバック) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+
     <script>
         // === 認証システム ===
         class AdminAuth {
@@ -870,6 +874,106 @@
         // グローバルインスタンス
         const adminAuth = new AdminAuth();
 
+        // === Supabase ユーティリティ ===
+        function supaAvailable() {
+            return typeof window.supa !== 'undefined' && window.supa !== null;
+        }
+
+        function sanitizeFilename(name) {
+            return (name || '').replace(/[^a-zA-Z0-9_.-]/g, '_');
+        }
+
+        async function uploadToSupabase(meta, file) {
+            if (!supaAvailable()) return { ok: false };
+            try {
+                const path = `${meta.category || 'misc'}/${meta.id}_${sanitizeFilename(meta.filename)}`;
+                const { error: upErr } = await window.supa.storage.from('media').upload(path, file, {
+                    contentType: meta.mimeType,
+                    cacheControl: '3600',
+                    upsert: true
+                });
+                if (upErr) throw upErr;
+
+                let publicUrl = '';
+                const { data: urlData } = window.supa.storage.from('media').getPublicUrl(path);
+                if (urlData && urlData.publicUrl) publicUrl = urlData.publicUrl;
+
+                // メタデータをDBに記録（テーブル: portfolio_items）
+                try {
+                    await window.supa.from('portfolio_items').insert({
+                        id: meta.id,
+                        title: meta.title,
+                        description: meta.description,
+                        category: meta.category,
+                        mime_type: meta.mimeType,
+                        size: meta.size,
+                        storage_path: path,
+                        public_url: publicUrl,
+                        type: meta.type
+                    });
+                } catch (e) {
+                    console.warn('Supabase DB insert skipped/failed:', e?.message || e);
+                }
+
+                return { ok: true, publicUrl, path };
+            } catch (e) {
+                console.warn('Supabase upload failed, falling back:', e?.message || e);
+                return { ok: false, error: e };
+            }
+        }
+
+        // === IndexedDB ユーティリティ ===
+        const IDB_DB_NAME = 'garciaaan_portfolio_db';
+        const IDB_STORE_MEDIA = 'media';
+
+        function openPortfolioDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(IDB_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(IDB_STORE_MEDIA)) {
+                        db.createObjectStore(IDB_STORE_MEDIA, { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function idbSaveMedia(itemWithMeta, blob) {
+            const db = await openPortfolioDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE_MEDIA, 'readwrite');
+                const store = tx.objectStore(IDB_STORE_MEDIA);
+                const record = { ...itemWithMeta, blob };
+                store.put(record);
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function idbGetMedia(id) {
+            const db = await openPortfolioDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE_MEDIA, 'readonly');
+                const store = tx.objectStore(IDB_STORE_MEDIA);
+                const req = store.get(id);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function idbDeleteMedia(id) {
+            const db = await openPortfolioDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE_MEDIA, 'readwrite');
+                const store = tx.objectStore(IDB_STORE_MEDIA);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
         // ログインフォーム処理
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -918,7 +1022,7 @@
         }
 
         // タブ切り替え
-        function showTab(tabName) {
+        function showTab(tabName, ev) {
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
@@ -927,7 +1031,7 @@
             });
             
             document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            (ev && ev.target ? ev.target : document.querySelector(`.tab[onclick*="${tabName}"]`)).classList.add('active');
             
             if (tabName === 'manage') {
                 loadPortfolioItems();
@@ -964,8 +1068,11 @@
             if (files.length === 0) return;
 
             const file = files[0];
-            if (!file.type.startsWith('video/')) {
-                showStatus('動画ファイルを選択してください', 'error');
+            const isVideo = file.type.startsWith('video/');
+            const isImage = file.type.startsWith('image/');
+            
+            if (!isVideo && !isImage) {
+                showStatus('画像ファイルまたは動画ファイルを選択してください', 'error');
                 return;
             }
 
@@ -978,7 +1085,28 @@
             const previewVideo = document.getElementById('previewVideo');
             
             const fileURL = URL.createObjectURL(file);
-            previewVideo.src = fileURL;
+            
+            if (isVideo) {
+                previewVideo.src = fileURL;
+                previewVideo.style.display = 'block';
+                // 画像要素があれば非表示
+                const previewImg = videoPreview.querySelector('img');
+                if (previewImg) previewImg.style.display = 'none';
+            } else if (isImage) {
+                // 画像プレビューを作成
+                let previewImg = videoPreview.querySelector('img');
+                if (!previewImg) {
+                    previewImg = document.createElement('img');
+                    previewImg.style.maxWidth = '100%';
+                    previewImg.style.maxHeight = '300px';
+                    previewImg.style.objectFit = 'contain';
+                    videoPreview.appendChild(previewImg);
+                }
+                previewImg.src = fileURL;
+                previewImg.style.display = 'block';
+                previewVideo.style.display = 'none';
+            }
+            
             videoPreview.style.display = 'block';
 
             // ファイルをメモリに保存（実際の実装では別の方法を使用）
@@ -991,10 +1119,17 @@
             const description = document.getElementById('videoDescription').value;
             const category = document.getElementById('videoCategory').value;
 
-            if (!title || !window.currentFile) {
-                showStatus('タイトルとファイルが必要です', 'error');
+            if (!title) {
+                showStatus('タイトルが必要です', 'error');
                 return;
             }
+
+            if (!window.currentFile) {
+                showStatus('ファイルを選択してください', 'error');
+                return;
+            }
+
+            console.log('Saving video info:', { title, description, category, file: window.currentFile.name });
 
             // プログレスバーを表示
             document.getElementById('progressBar').style.display = 'block';
@@ -1012,48 +1147,111 @@
                     progress = 100;
                     clearInterval(interval);
                     
-                    // ローカルストレージに保存
+                    // 保存（IndexedDB + メタデータ）
                     saveToLocalStorage(title, description, category);
                     showStatus('アップロードが完了しました！', 'success');
-                    resetForm();
+                    // resetForm(); // これを削除（saveToLocalStorage内で実行）
                 }
                 progressFill.style.width = progress + '%';
             }, 200);
         }
 
-        // ローカルストレージに保存
-        function saveToLocalStorage(title, description, category) {
+        // ローカルストレージ(メタ) + IndexedDB(実体)に保存
+        async function saveToLocalStorage(title, description, category) {
+            if (!window.currentFile) {
+                console.error('No file selected');
+                showStatus('ファイルが選択されていません', 'error');
+                return;
+            }
+
             const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
-            
-            const newItem = {
-                id: Date.now(),
+
+            const isVideo = window.currentFile.type.startsWith('video/');
+            const isImage = window.currentFile.type.startsWith('image/');
+
+            console.log('Processing file (IDB):', window.currentFile.name, 'Type:', window.currentFile.type);
+
+            const newId = Date.now();
+            const meta = {
+                id: newId,
                 title: title,
                 description: description,
                 category: category,
                 filename: window.currentFile.name,
+                // filePath は IDB の Blob を使用するため保存しない
+                type: isVideo ? 'video' : (isImage ? 'image' : 'file'),
+                mimeType: window.currentFile.type,
                 uploadDate: new Date().toISOString(),
-                size: window.currentFile.size
+                size: window.currentFile.size,
+                idb: true
             };
 
-            portfolioItems.push(newItem);
-            localStorage.setItem('portfolioItems', JSON.stringify(portfolioItems));
+            try {
+                await idbSaveMedia(meta, window.currentFile);
+                portfolioItems.push(meta);
+                localStorage.setItem('portfolioItems', JSON.stringify(portfolioItems));
+
+                console.log('Saved item to IndexedDB with meta:', meta);
+
+                // Supabase にもアップロード（存在すれば）
+                uploadToSupabase(meta, window.currentFile).then(res => {
+                    if (res.ok) {
+                        console.log('Uploaded to Supabase:', res);
+                    }
+                });
+
+                await loadPortfolioItems();
+                resetForm();
+            } catch (error) {
+                console.error('IndexedDB save error:', error);
+                showStatus('保存に失敗しました（IndexedDB）', 'error');
+            }
         }
 
-        // ポートフォリオアイテムの読み込み
-        function loadPortfolioItems() {
+        // ポートフォリオアイテムの読み込み（IDB対応）
+        async function loadPortfolioItems() {
             const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
             const grid = document.getElementById('portfolioGrid');
-            
+
             if (portfolioItems.length === 0) {
                 grid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">まだ作品がアップロードされていません</p>';
                 return;
             }
 
-            grid.innerHTML = portfolioItems.map(item => `
-                <div class="portfolio-item">
-                    <div style="height: 200px; background: #333; display: flex; align-items: center; justify-content: center; color: #888;">
-                        <p>動画プレビュー<br>${item.filename}</p>
-                    </div>
+            grid.innerHTML = '';
+
+            for (const item of portfolioItems) {
+                let objectUrl = null;
+                try {
+                    if (item.idb) {
+                        const record = await idbGetMedia(item.id);
+                        if (record && record.blob) {
+                            objectUrl = URL.createObjectURL(record.blob);
+                        }
+                    }
+                } catch (e) {
+                    console.error('IDB read error for id', item.id, e);
+                }
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'portfolio-item';
+
+                let previewContent = '';
+                const src = objectUrl || item.filePath || '';
+                if ((objectUrl || item.filePath) && item.type === 'video') {
+                    previewContent = `<video style="width: 100%; height: 200px; object-fit: cover;" controls muted>
+                        <source src="${src}" type="${item.mimeType}">
+                    </video>`;
+                } else if ((objectUrl || item.filePath) && item.type === 'image') {
+                    previewContent = `<img src="${src}" style="width: 100%; height: 200px; object-fit: cover;" alt="${item.title}">`;
+                } else {
+                    previewContent = `<div style="height: 200px; background: #333; display: flex; align-items: center; justify-content: center; color: #888;">
+                        <p>プレビューなし<br>${item.filename}</p>
+                    </div>`;
+                }
+
+                wrapper.innerHTML = `
+                    ${previewContent}
                     <div class="portfolio-info">
                         <div class="portfolio-title">${item.title}</div>
                         <div class="portfolio-description">${item.description}</div>
@@ -1065,9 +1263,10 @@
                             <button class="btn btn-use" onclick="useAsHero(${item.id})">ヒーローに使用</button>
                             <button class="btn btn-delete" onclick="deleteItem(${item.id})">削除</button>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    </div>`;
+
+                grid.appendChild(wrapper);
+            }
         }
 
         // ファイルサイズのフォーマット
@@ -1103,12 +1302,20 @@
         }
 
         // アイテムの削除
-        function deleteItem(id) {
+        async function deleteItem(id) {
             if (confirm('この作品を削除しますか？')) {
                 const portfolioItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
-                const filteredItems = portfolioItems.filter(item => item.id !== id);
+                const item = portfolioItems.find(i => i.id === id);
+                const filteredItems = portfolioItems.filter(entry => entry.id !== id);
                 localStorage.setItem('portfolioItems', JSON.stringify(filteredItems));
-                loadPortfolioItems();
+                try {
+                    if (item && item.idb) {
+                        await idbDeleteMedia(id);
+                    }
+                } catch (e) {
+                    console.error('IDB delete error:', e);
+                }
+                await loadPortfolioItems();
                 showStatus('作品を削除しました', 'success');
             }
         }

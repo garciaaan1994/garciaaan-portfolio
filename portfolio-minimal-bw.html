@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - garciaaan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #000;
+            height: 100vh;
+            overflow: hidden;
+            cursor: default;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        .portfolio-text {
+            font-size: clamp(4rem, 12vw, 12rem);
+            font-weight: 100;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+            z-index: 10;
+            border: 2px solid #fff;
+            padding: 40px 60px;
+            background: transparent;
+        }
+
+        .portfolio-text:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .particle.image-particle {
+            border-radius: 8px;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(120%);
+        }
+
+        .particle.text-particle {
+            background: #fff;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 1rem;
+            opacity: 0.6;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 300;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .reset-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .reset-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .admin-link {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 300;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+        }
+
+        .admin-link:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .mode-toggle {
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .mode-toggle:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .portfolio-text {
+                font-size: clamp(2.5rem, 15vw, 6rem);
+                padding: 20px 30px;
+            }
+            
+            .instructions {
+                font-size: 0.9rem;
+                bottom: 30px;
+                padding: 0 20px;
+            }
+            
+            .reset-btn, .admin-link {
+                top: 30px;
+                padding: 12px 20px;
+                font-size: 0.8rem;
+            }
+
+            .admin-link {
+                left: 30px;
+            }
+
+            .reset-btn {
+                right: 30px;
+            }
+
+            .mode-toggle {
+                bottom: 30px;
+                right: 30px;
+                padding: 8px 16px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="portfolio-text" id="portfolioText">PORTFOLIO</h1>
+        <button class="reset-btn" id="resetBtn">RESET</button>
+        <a href="admin.html" class="admin-link">ADMIN</a>
+        <button class="mode-toggle" id="modeToggle">IMAGE MODE</button>
+        <div class="instructions">
+            Click "PORTFOLIO" to see particle explosion | Use ADMIN to upload images
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        class MinimalParticleExplosion {
+            constructor() {
+                this.text = document.getElementById('portfolioText');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.modeToggle = document.getElementById('modeToggle');
+                this.container = document.querySelector('.container');
+                this.particles = [];
+                this.isExploded = false;
+                this.imageMode = false;
+                this.portfolioImages = [];
+                
+                this.init();
+                this.loadPortfolioImages();
+            }
+
+            init() {
+                this.text.addEventListener('click', () => this.explode());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                this.modeToggle.addEventListener('click', () => this.toggleMode());
+                
+                // Create particle pool
+                this.createParticlePool();
+            }
+
+            loadPortfolioImages() {
+                // Load images from localStorage (from admin panel)
+                const savedItems = JSON.parse(localStorage.getItem('portfolioItems') || '[]');
+                this.portfolioImages = savedItems.filter(item => 
+                    item.type === 'image' && item.filePath
+                );
+            }
+
+            toggleMode() {
+                this.imageMode = !this.imageMode;
+                this.modeToggle.textContent = this.imageMode ? 'TEXT MODE' : 'IMAGE MODE';
+                
+                // Update instructions
+                const instructions = document.querySelector('.instructions');
+                instructions.textContent = this.imageMode ? 
+                    'Click "PORTFOLIO" to scatter your uploaded images' :
+                    'Click "PORTFOLIO" to see particle explosion | Use ADMIN to upload images';
+            }
+
+            createParticlePool() {
+                // Create both text and image particle elements
+                for (let i = 0; i < 200; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.display = 'none';
+                    this.container.appendChild(particle);
+                }
+            }
+
+            explode() {
+                if (this.isExploded) return;
+                
+                this.isExploded = true;
+                
+                // Hide original text with minimal effect
+                gsap.to(this.text, {
+                    duration: 0.2,
+                    opacity: 0,
+                    scale: 0.9,
+                    ease: "power2.out"
+                });
+
+                // Get text position
+                const textRect = this.text.getBoundingClientRect();
+                const centerX = textRect.left + textRect.width / 2;
+                const centerY = textRect.top + textRect.height / 2;
+
+                // Create particles based on mode
+                if (this.imageMode && this.portfolioImages.length > 0) {
+                    this.createImageParticles(centerX, centerY);
+                } else {
+                    this.createTextParticles(centerX, centerY);
+                }
+                
+                // Show reset button
+                setTimeout(() => {
+                    this.resetBtn.classList.add('show');
+                }, 800);
+            }
+
+            createTextParticles(centerX, centerY) {
+                const particleElements = document.querySelectorAll('.particle');
+                const numParticles = 80;
+                
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = particleElements[i];
+                    
+                    // Minimal black/white particles
+                    const angle = (Math.PI * 2 * i) / numParticles + (Math.random() - 0.5) * 0.8;
+                    const velocity = Math.random() * 400 + 200;
+                    const size = Math.random() * 20 + 10;
+                    const isWhite = Math.random() > 0.5;
+                    
+                    // Set particle properties
+                    particle.className = 'particle text-particle';
+                    particle.style.display = 'block';
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.background = isWhite ? '#fff' : '#000';
+                    particle.style.border = isWhite ? '1px solid #000' : '1px solid #fff';
+                    particle.style.opacity = '1';
+                    particle.style.transform = 'translate(-50%, -50%)';
+                    
+                    // Calculate final position
+                    const finalX = centerX + Math.cos(angle) * velocity;
+                    const finalY = centerY + Math.sin(angle) * velocity + (Math.random() - 0.5) * 200;
+                    
+                    // Minimal animation
+                    const tl = gsap.timeline();
+                    
+                    tl.to(particle, {
+                        duration: 1.5,
+                        x: finalX - centerX,
+                        y: finalY - centerY,
+                        rotation: Math.random() * 720,
+                        ease: "power2.out"
+                    })
+                    .to(particle, {
+                        duration: 0.8,
+                        opacity: 0,
+                        scale: 0,
+                        ease: "power2.in"
+                    }, "-=0.5");
+                    
+                    this.particles.push({
+                        element: particle,
+                        timeline: tl
+                    });
+                }
+            }
+
+            createImageParticles(centerX, centerY) {
+                const particleElements = document.querySelectorAll('.particle');
+                const numImages = Math.min(this.portfolioImages.length * 5, 50); // Multiple copies of each image
+                
+                for (let i = 0; i < numImages; i++) {
+                    const particle = particleElements[i];
+                    const imageData = this.portfolioImages[i % this.portfolioImages.length];
+                    
+                    // Create image particle
+                    const angle = (Math.PI * 2 * i) / numImages + (Math.random() - 0.5) * 1.0;
+                    const velocity = Math.random() * 500 + 250;
+                    const size = Math.random() * 80 + 60;
+                    
+                    // Set as image particle
+                    particle.className = 'particle image-particle';
+                    particle.style.display = 'block';
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.backgroundImage = `url(${imageData.filePath})`;
+                    particle.style.backgroundSize = 'cover';
+                    particle.style.backgroundPosition = 'center';
+                    particle.style.border = '2px solid #fff';
+                    particle.style.opacity = '1';
+                    particle.style.transform = 'translate(-50%, -50%)';
+                    
+                    // Calculate final position
+                    const finalX = centerX + Math.cos(angle) * velocity * 1.2;
+                    const finalY = centerY + Math.sin(angle) * velocity * 1.2 + (Math.random() - 0.5) * 300;
+                    
+                    // Image animation
+                    const tl = gsap.timeline();
+                    
+                    tl.to(particle, {
+                        duration: 0.1,
+                        scale: 1.2,
+                        ease: "power2.out"
+                    })
+                    .to(particle, {
+                        duration: 2,
+                        x: finalX - centerX,
+                        y: finalY - centerY,
+                        rotation: Math.random() * 1080,
+                        ease: "power3.out"
+                    }, 0.1)
+                    .to(particle, {
+                        duration: 1,
+                        opacity: 0,
+                        scale: 0.5,
+                        ease: "power2.in"
+                    }, "-=0.8");
+                    
+                    this.particles.push({
+                        element: particle,
+                        timeline: tl
+                    });
+                }
+            }
+
+            reset() {
+                // Kill all particle animations
+                this.particles.forEach(particle => {
+                    particle.timeline.kill();
+                    particle.element.style.display = 'none';
+                });
+                
+                this.particles = [];
+                this.isExploded = false;
+                
+                // Hide reset button
+                gsap.to(this.resetBtn, {
+                    duration: 0.3,
+                    opacity: 0,
+                    onComplete: () => {
+                        this.resetBtn.classList.remove('show');
+                    }
+                });
+                
+                // Minimal text reformation
+                gsap.fromTo(this.text, 
+                    { scale: 0.9, opacity: 0 },
+                    { 
+                        scale: 1, 
+                        opacity: 1, 
+                        duration: 0.8, 
+                        ease: "power2.out" 
+                    }
+                );
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new MinimalParticleExplosion();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - garciaaan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        .portfolio-text {
+            font-size: clamp(4rem, 12vw, 12rem);
+            font-weight: 900;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        .portfolio-text:hover {
+            transform: scale(1.05);
+            text-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 5;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.2rem;
+            opacity: 0.7;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .reset-btn.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .portfolio-text {
+                font-size: clamp(3rem, 15vw, 8rem);
+            }
+            
+            .instructions {
+                font-size: 1rem;
+                bottom: 30px;
+                padding: 0 20px;
+            }
+            
+            .reset-btn {
+                top: 30px;
+                right: 30px;
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="portfolio-text" id="portfolioText">PORTFOLIO</h1>
+        <button class="reset-btn" id="resetBtn">RESET</button>
+        <div class="instructions">
+            Click "PORTFOLIO" to explode into particles 💥 | Click "RESET" to reform ✨
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        class ParticleExplosion {
+            constructor() {
+                this.text = document.getElementById('portfolioText');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.container = document.querySelector('.container');
+                this.particles = [];
+                this.isExploded = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.text.addEventListener('click', () => this.explode());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                
+                // Preload particles for better performance
+                this.createParticlePool();
+            }
+
+            createParticlePool() {
+                // Create particle elements ahead of time
+                for (let i = 0; i < 150; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.display = 'none';
+                    this.container.appendChild(particle);
+                }
+            }
+
+            explode() {
+                if (this.isExploded) return;
+                
+                this.isExploded = true;
+                
+                // Hide original text
+                gsap.to(this.text, {
+                    duration: 0.1,
+                    opacity: 0,
+                    scale: 1.2,
+                    ease: "power2.out"
+                });
+
+                // Get text position
+                const textRect = this.text.getBoundingClientRect();
+                const centerX = textRect.left + textRect.width / 2;
+                const centerY = textRect.top + textRect.height / 2;
+
+                // Create particles
+                this.createParticles(centerX, centerY);
+                
+                // Show reset button
+                setTimeout(() => {
+                    this.resetBtn.classList.add('show');
+                }, 1000);
+            }
+
+            createParticles(centerX, centerY) {
+                const particleElements = document.querySelectorAll('.particle');
+                const numParticles = 150;
+                
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = particleElements[i];
+                    
+                    // More dramatic spread
+                    const angle = (Math.PI * 2 * i) / numParticles + (Math.random() - 0.5) * 1.0;
+                    const velocity = Math.random() * 500 + 200; // Increased velocity
+                    const size = Math.random() * 12 + 6; // Larger particles
+                    const hue = Math.random() * 360; // Full color spectrum
+                    
+                    // Set particle properties
+                    particle.style.display = 'block';
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.background = `radial-gradient(circle, hsl(${hue}, 80%, 70%), hsl(${hue + 30}, 70%, 50%))`;
+                    particle.style.opacity = '1';
+                    particle.style.transform = 'translate(-50%, -50%)';
+                    particle.style.boxShadow = `0 0 20px hsl(${hue}, 80%, 70%)`;
+                    
+                    // Calculate final position - much further spread
+                    const finalX = centerX + Math.cos(angle) * velocity * 1.5;
+                    const finalY = centerY + Math.sin(angle) * velocity * 1.5 + (Math.random() - 0.5) * 400;
+                    
+                    // Animate particle with more dramatic effect
+                    const tl = gsap.timeline();
+                    
+                    // Initial burst
+                    tl.to(particle, {
+                        duration: 0.1,
+                        scale: 1.5,
+                        ease: "power2.out"
+                    })
+                    // Main trajectory
+                    .to(particle, {
+                        duration: 1.2,
+                        x: finalX - centerX,
+                        y: finalY - centerY,
+                        rotation: Math.random() * 1440, // More rotation
+                        ease: "power3.out"
+                    }, 0.1)
+                    // Gravity effect
+                    .to(particle, {
+                        duration: 0.8,
+                        y: '+=200',
+                        ease: "power2.in"
+                    }, 0.4)
+                    // Fade out
+                    .to(particle, {
+                        duration: 0.6,
+                        opacity: 0,
+                        scale: 0,
+                        ease: "power2.in"
+                    }, "-=0.3");
+                    
+                    // Store particle reference
+                    this.particles.push({
+                        element: particle,
+                        timeline: tl
+                    });
+                }
+                
+                // Add screen shake effect
+                gsap.to(document.body, {
+                    duration: 0.5,
+                    x: 5,
+                    yoyo: true,
+                    repeat: 5,
+                    ease: "power2.inOut"
+                });
+            }
+
+            reset() {
+                // Kill all particle animations
+                this.particles.forEach(particle => {
+                    particle.timeline.kill();
+                    particle.element.style.display = 'none';
+                });
+                
+                this.particles = [];
+                this.isExploded = false;
+                
+                // Hide reset button first
+                gsap.to(this.resetBtn, {
+                    duration: 0.3,
+                    opacity: 0,
+                    scale: 0.8,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        this.resetBtn.classList.remove('show');
+                    }
+                });
+                
+                // Add dramatic text reformation effect
+                const letters = "PORTFOLIO".split("");
+                this.text.innerHTML = "";
+                
+                letters.forEach((letter, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = letter;
+                    span.style.display = 'inline-block';
+                    span.style.opacity = '0';
+                    span.style.transform = `translateY(${Math.random() * 200 - 100}px) rotate(${Math.random() * 360}deg) scale(0)`;
+                    this.text.appendChild(span);
+                    
+                    // Animate each letter back into place
+                    gsap.to(span, {
+                        duration: 0.8,
+                        opacity: 1,
+                        scale: 1,
+                        rotation: 0,
+                        y: 0,
+                        ease: "back.out(1.7)",
+                        delay: index * 0.1
+                    });
+                });
+                
+                // Reset the whole text element
+                gsap.fromTo(this.text, 
+                    { scale: 0.5, opacity: 0 },
+                    { 
+                        scale: 1, 
+                        opacity: 1, 
+                        duration: 1, 
+                        ease: "elastic.out(1, 0.5)" 
+                    }
+                );
+                
+                // Add celebratory background flash
+                gsap.to(document.body, {
+                    duration: 0.2,
+                    filter: 'brightness(1.5)',
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.inOut"
+                });
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ParticleExplosion();
+        });
+
+        // Add some background interaction
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.body.style.background = `linear-gradient(135deg, 
+                hsl(${230 + x * 20}, 70%, ${60 + y * 10}%) 0%, 
+                hsl(${280 + x * 20}, 70%, ${50 + y * 10}%) 100%)`;
+        });
+    </script>
+</body>
+</html>

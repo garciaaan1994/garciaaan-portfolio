@@ -4,6 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>garciaaan STUDIO</title>
+    <script>
+        // Replace this document with portfolio-interactive.html content (no redirect)
+        (function() {
+            var target = 'portfolio-interactive.html';
+            try {
+                fetch(target, { cache: 'no-store' })
+                    .then(function(res) { return res.text(); })
+                    .then(function(html) {
+                        document.open();
+                        document.write(html);
+                        document.close();
+                    })
+                    .catch(function() {
+                        // fallback: show link
+                        var a = document.createElement('a');
+                        a.href = target;
+                        a.textContent = 'Open portfolio';
+                        document.body.innerHTML = '';
+                        document.body.appendChild(a);
+                    });
+            } catch (e) {
+                console.error('Inline replace failed', e);
+            }
+        })();
+    </script>
+    <script>
+        // 直接 index.html 上で portfolio-interactive のJS/CSSを読み込んで初期化
+        (function() {
+            var head = document.getElementsByTagName('head')[0];
+            var linkGsap = document.createElement('script');
+            linkGsap.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+            head.appendChild(linkGsap);
+
+            var linkSupabase = document.createElement('script');
+            linkSupabase.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+            head.appendChild(linkSupabase);
+
+            var linkConfig = document.createElement('script');
+            linkConfig.src = 'config.js';
+            head.appendChild(linkConfig);
+        })();
+    </script>
+    <!-- Home renders interactive experience inline (no redirect) -->
     <style>
         * {
             margin: 0;
@@ -596,33 +639,8 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <!-- Temporarily hidden for testing interactive graphics -->
-        <!-- <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="">
-            <source src="videos/horse-video.mp4" type="video/mp4">
-        </video> -->
-        
-        <!-- Interactive Graphics Layer -->
-        <div class="geometric-shapes">
-            <div class="shape"></div>
-            <div class="shape"></div>
-            <div class="shape"></div>
-            <div class="shape"></div>
-        </div>
-        
-        <!-- Neural Network Canvas -->
-        <canvas class="neural-network" id="neuralCanvas"></canvas>
-        
-        <!-- Connection Lines -->
-        <canvas class="connection-lines" id="connectionCanvas"></canvas>
-        
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1>garciaaan</h1>
-            <p>With a product manager's vision and AI's imagination, we craft art pieces that merge human sensitivity with machine intelligence.</p>
-        </div>
-    </section>
+    <!-- Interactive Portfolio root -->
+    <div id="interactive-root"></div>
 
     <!-- About Section -->
     <section class="about" id="about">
