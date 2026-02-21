@@ -1,21 +1,24 @@
 # Dependencies
 node_modules/
 
-# Build outputs
+# Next.js
+.next/
+out/
+
+# Build
 dist/
 build/
-out/
 
 # Logs
 *.log
 npm-debug.log*
 
-# Runtime data
+# Runtime
 pids
 *.pid
 *.seed
 
-# OS generated files
+# OS
 .DS_Store
 .DS_Store?
 ._*
@@ -24,12 +27,20 @@ pids
 ehthumbs.db
 Thumbs.db
 
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Temporary files
+# Temp
 *.tmp
 *.temp
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Netlify
+.netlify/
