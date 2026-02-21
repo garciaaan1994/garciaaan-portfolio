@@ -23,7 +23,7 @@ export default async function WorkDetail({
   if (!work) notFound();
 
   return (
-    <section className="min-h-screen px-6 pt-28 pb-20 md:px-10">
+    <section className="min-h-screen px-10 pt-52 pb-32 md:px-20 md:pt-60 lg:px-28">
       <div className="mx-auto max-w-4xl">
         {/* Back */}
         <Link
@@ -35,7 +35,7 @@ export default async function WorkDetail({
         </Link>
 
         {/* Title area */}
-        <div className="mt-12 mb-12">
+        <div className="mt-14 mb-14">
           <span className="text-[9px] tracking-[0.3em] text-white/30 uppercase">
             {work.category} — {work.year}
           </span>

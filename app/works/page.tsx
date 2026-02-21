@@ -10,10 +10,10 @@ export default function WorksPage() {
   const works = getAllWorks();
 
   return (
-    <section className="min-h-screen px-6 pt-28 pb-20 md:px-10">
+    <section className="min-h-screen px-10 pt-52 pb-32 md:px-20 md:pt-60 lg:px-28">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-16">
+        <div className="mb-20">
           <h1 className="text-xs font-light tracking-[0.4em] text-white/40 uppercase">
             Selected Works
           </h1>
