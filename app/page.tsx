@@ -13,14 +13,25 @@ export default function Home() {
       {/* ─── INDEX ─── */}
       <section id="index" className="relative h-screen w-full overflow-hidden bg-[#050505]">
         <ParticleField />
-        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center">
-          <h1 className="text-[clamp(2rem,8vw,6rem)] font-extralight tracking-[0.3em] text-white/[0.07] uppercase select-none">
-            garciaaan
-          </h1>
-          <p className="mt-4 text-[10px] tracking-[0.4em] text-white/20 uppercase">
+
+        {/* Graffiti hero image */}
+        <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center">
+          <img
+            src="/images/hero-graffiti.svg"
+            alt=""
+            className="h-auto w-[min(80vw,700px)] opacity-90 mix-blend-lighten select-none"
+            draggable={false}
+          />
+        </div>
+
+        {/* Subtitle */}
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-end pb-28">
+          <p className="text-[10px] tracking-[0.4em] text-white/20 uppercase">
             Tokyo — Design &amp; Code
           </p>
         </div>
+
+        {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2">
           <div className="flex flex-col items-center gap-2">
             <span className="text-[8px] tracking-[0.3em] text-white/20 uppercase">
