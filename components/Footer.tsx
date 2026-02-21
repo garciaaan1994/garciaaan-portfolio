@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/5 px-6 py-10 md:px-10">
+    <footer className="border-t border-white/5 px-10 py-16 md:px-20 lg:px-28">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
         <p className="text-[10px] tracking-[0.2em] text-white/30 uppercase">
           &copy; {new Date().getFullYear()} garciaaan

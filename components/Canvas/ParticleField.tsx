@@ -159,8 +159,7 @@ export default function ParticleField() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0"
-      style={{ background: "#050505" }}
+      className="absolute inset-0 z-0"
     />
   );
 }

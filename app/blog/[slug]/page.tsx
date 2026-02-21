@@ -17,7 +17,7 @@ export default async function BlogPost({
   if (!post) notFound();
 
   return (
-    <section className="min-h-screen px-6 pt-28 pb-20 md:px-10">
+    <section className="min-h-screen px-10 pt-52 pb-32 md:px-20 md:pt-60 lg:px-28">
       <div className="mx-auto max-w-3xl">
         {/* Back */}
         <Link
