@@ -29,10 +29,12 @@ export async function generateMetadata({
       description: post.description,
       type: "article",
       url: `https://garciaaan.com/blog/${slug}`,
+      images: [{ url: "/og.png", width: 1200, height: 630 }],
     },
     twitter: {
       title: post.title,
       description: post.description,
+      images: ["/og.png"],
     },
   };
 }
