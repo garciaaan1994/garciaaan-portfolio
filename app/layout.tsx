@@ -5,6 +5,7 @@ import "./globals.css";
 const GA_ID = "G-JQEB2MC1LK";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://garciaaan.com"),
   title: "garciaaan",
   description: "garciaaan — product manager & business strategist based in Tokyo.",
   openGraph: {
