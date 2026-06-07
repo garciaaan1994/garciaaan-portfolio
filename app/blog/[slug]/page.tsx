@@ -1,7 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { JetBrains_Mono } from "next/font/google";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
+import PaperTheme from "@/components/PaperTheme";
+import MagneticCursor from "@/components/MagneticCursor";
+import MobileNav from "@/components/MobileNav";
+
+const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
 export function generateStaticParams() {
   return getAllPosts().map((p) => ({ slug: p.slug }));
@@ -17,32 +23,73 @@ export default async function BlogPost({
   if (!post) notFound();
 
   return (
-    <section className="min-h-screen px-10 pt-52 pb-32 md:px-20 md:pt-60 lg:px-28">
-      <div className="mx-auto max-w-3xl">
-        {/* Back */}
+    <div className={`kt ${mono.className} relative min-h-screen text-[var(--kt-fg)]`}>
+      <PaperTheme />
+      <MagneticCursor />
+      <div className="kt-scanlines pointer-events-none fixed inset-0 z-[2]" />
+      <div className="kt-vignette pointer-events-none fixed inset-0 z-[2]" />
+
+      {/* system bar */}
+      <header className="fixed top-0 left-0 z-30 flex w-full items-center justify-between border-b border-[var(--kt-border)] bg-[var(--kt-bg)]/75 px-4 py-2 text-[10px] tracking-wider backdrop-blur-sm sm:px-6">
+        <span className="text-[var(--kt-accent)]">● SYSTEM: garciaaan.studio</span>
+        <nav className="hidden gap-5 sm:flex">
+          {["works", "about", "blog", "contact"].map((s) => (
+            <a
+              key={s}
+              href={`/#${s}`}
+              className="text-[var(--kt-fg)]/60 transition-colors hover:text-[var(--kt-accent)]"
+              data-cursor-hover
+            >
+              ./{s}
+            </a>
+          ))}
+        </nav>
+        <span className="hidden text-[var(--kt-amber)] sm:inline">STATUS: ONLINE</span>
+        <MobileNav base="/" />
+      </header>
+
+      <main className="relative z-10 mx-auto max-w-3xl px-6 pt-32 pb-32 sm:px-10 sm:pt-40">
+        {/* back */}
         <Link
-          href="/blog"
-          className="inline-block text-[10px] tracking-[0.3em] text-white/30 uppercase transition-colors hover:text-white/60"
+          href="/#blog"
+          className="inline-block text-[10px] tracking-[0.3em] text-[var(--kt-dim)] uppercase transition-colors hover:text-[var(--kt-accent)]"
           data-cursor-hover
         >
-          &larr; Back to blog
+          &larr; cd ../blog
         </Link>
 
-        {/* Header */}
-        <div className="mt-12 mb-12">
-          <time className="text-[10px] tabular-nums tracking-wider text-white/20">
-            {post.date}
-          </time>
-          <h1 className="mt-2 text-xl font-extralight tracking-[0.1em] text-white/90 md:text-3xl">
-            {post.title}
-          </h1>
+        {/* prompt */}
+        <div className="mt-10 mb-6 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-[var(--kt-accent)]">garciaaan@studio</span>
+          <span className="text-[var(--kt-dim)]">:</span>
+          <span className="text-[var(--kt-amber)]">~</span>
+          <span className="text-[var(--kt-dim)]">$</span>
+          <span className="text-[var(--kt-fg)]">cat ./blog/{slug}.mdx</span>
         </div>
 
+        {/* header */}
+        <time className="text-[10px] tracking-wider text-[var(--kt-dim)] tabular-nums">
+          {post.date}
+        </time>
+        <h1
+          className="kt-glitch mt-3 text-4xl leading-[0.95] font-bold tracking-tight sm:text-6xl"
+          data-text={post.title}
+        >
+          {post.title}
+        </h1>
+        {post.description && (
+          <p className="mt-5 text-sm text-[var(--kt-fg)]/45">{post.description}</p>
+        )}
+
+        <div className="my-12 h-px w-full bg-[var(--kt-border)]" />
+
         {/* MDX content */}
-        <article className="prose prose-invert prose-sm max-w-none font-light prose-headings:font-extralight prose-headings:tracking-wide prose-p:text-white/50 prose-p:leading-relaxed prose-a:text-white/60 prose-a:underline prose-a:underline-offset-4 prose-strong:text-white/70 prose-code:text-white/60 prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10">
+        <article className="kt-article">
           <MDXRemote source={post.content} />
         </article>
-      </div>
-    </section>
+
+        <p className="mt-20 text-[10px] text-[var(--kt-dim)]">© 2026 garciaaan</p>
+      </main>
+    </div>
   );
 }
