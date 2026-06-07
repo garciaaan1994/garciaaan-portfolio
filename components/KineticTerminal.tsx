@@ -344,7 +344,9 @@ export default function KineticTerminal({
 
       {/* system bar */}
       <header className="fixed top-0 left-0 z-30 flex w-full items-center justify-between border-b border-[var(--kt-border)] bg-[var(--kt-bg)]/75 px-4 py-2 text-[10px] tracking-wider backdrop-blur-sm sm:px-6">
-        <span className="text-[var(--kt-accent)]">● SYSTEM: garciaaan.studio</span>
+        <a href="/" className="text-[var(--kt-accent)] transition-opacity hover:opacity-70" data-cursor-hover>
+          ● SYSTEM: garciaaan.studio
+        </a>
         <nav className="hidden gap-5 sm:flex">
           {["works", "about", "blog", "contact"].map((s) => (
             <a key={s} href={`#${s}`} className="text-[var(--kt-fg)]/60 transition-colors hover:text-[var(--kt-accent)]" data-cursor-hover>
