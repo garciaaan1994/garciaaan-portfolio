@@ -4,3 +4,26 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# next/og static files are exported without a .png extension, so Netlify
+# serves them as application/octet-stream. Force image/png so OG/Twitter
+# card crawlers render them.
+[[headers]]
+  for = "/opengraph-image"
+  [headers.values]
+    Content-Type = "image/png"
+
+[[headers]]
+  for = "/twitter-image"
+  [headers.values]
+    Content-Type = "image/png"
+
+[[headers]]
+  for = "/blog/:slug/opengraph-image"
+  [headers.values]
+    Content-Type = "image/png"
+
+[[headers]]
+  for = "/blog/:slug/twitter-image"
+  [headers.values]
+    Content-Type = "image/png"
