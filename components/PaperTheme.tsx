@@ -11,7 +11,7 @@ export default function PaperTheme() {
         --kt-bg: #f3f1ea; /* warm paper */
         --kt-fg: #17150f; /* ink */
         --kt-dim: #978f7e; /* muted */
-        --kt-accent: #c2603f; /* terracotta — matches PALETTE.c1 */
+        --kt-accent: #f97316; /* bright orange — matches PALETTE.c1 */
         --kt-amber: #1f6f66; /* muted teal — matches PALETTE.c2 */
         --kt-border: rgba(23, 21, 15, 0.14);
         background: var(--kt-bg);

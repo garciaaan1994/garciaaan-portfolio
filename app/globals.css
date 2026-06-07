@@ -5,7 +5,7 @@
   --color-bg: #f3f1ea;
   --color-fg: #17150f;
   --color-muted: #978f7e;
-  --color-accent: #c2603f;
+  --color-accent: #f97316;
   --color-dim: #d9d5cc;
   --color-border: rgba(23, 21, 15, 0.14);
 }
@@ -27,7 +27,7 @@
   }
 
   ::selection {
-    background: rgba(194, 96, 63, 0.18);
+    background: rgba(249, 115, 22, 0.20);
     color: #17150f;
   }
 

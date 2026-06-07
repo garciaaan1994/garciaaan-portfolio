@@ -69,7 +69,7 @@ void main(){
    Keep these in sync with the --kt-accent / --kt-amber CSS vars below.
    To restyle the whole site, change PALETTE only. */
 const PALETTE = {
-  c1: [0.761, 0.376, 0.247] as [number, number, number], // terracotta #C2603F
+  c1: [0.976, 0.451, 0.086] as [number, number, number], // bright orange #F97316
   c2: [0.122, 0.435, 0.400] as [number, number, number], // muted teal #1F6F66
 };
 
