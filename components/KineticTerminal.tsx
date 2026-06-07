@@ -363,7 +363,7 @@ export default function KineticTerminal({
 
       <main className="relative z-10 mx-auto max-w-6xl px-6 sm:px-10">
         {/* ─── HERO ─── */}
-        <section className="relative -mx-6 flex min-h-screen flex-col justify-center overflow-hidden px-6 sm:-mx-10 sm:px-10">
+        <section className="relative -mx-6 flex min-h-[58vh] flex-col justify-center overflow-hidden px-6 sm:-mx-10 sm:min-h-screen sm:px-10">
           {/* WebGL shader — the kinetic centerpiece, scoped to the hero */}
           <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-90" />
           <div className="relative z-10">
