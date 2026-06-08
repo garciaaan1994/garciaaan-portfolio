@@ -207,7 +207,7 @@ const COPY: Record<Lang, {
     aboutBio:
       "garciaaan is a product manager and business strategist based in Tokyo. For over a decade I've built consumer products across payments, fintech, C2C marketplaces, and creator platforms.",
     aboutSub:
-      "I translate complex systems — settlement law, pricing, incentive design — into experiences people use without thinking. End to end: SQL analysis → PRD → A/B design → design & dev direction → QA → release → impact. Off the clock, I dig records and DJ.",
+      "I've stayed close to products at very different stages and scales. Beyond UX and feature work, I also build what's behind the scenes — alliances, settlement-law compliance, and unit-cost cuts through vendor negotiation. I have a habit of watching the places where behavior surfaces, like social platforms and anonymous communities, reading where people hesitate and where they move; that's where experience design starts for me. On my own time I make visuals with AI (Midjourney, Runway), and the constant — at work and off — is turning new technology into something people can use without thinking.",
     noPosts: "// no posts yet — check back soon",
     contactLead: ["Let's create something ", "together", "."],
     location: "Tokyo, Japan",
@@ -221,7 +221,7 @@ const COPY: Record<Lang, {
     aboutBio:
       "garciaaan は東京拠点のプロダクトマネージャー／事業企画。十年以上にわたり、決済・フィンテック・CtoCマーケットプレイス・クリエイタープラットフォームなど、toC プロダクトを作ってきました。",
     aboutSub:
-      "決済法・価格設計・インセンティブ設計といった複雑な仕組みを、誰もが意識せず使える体験へ翻訳します。SQL分析 → PRD → A/Bテスト設計 → デザイン／開発ディレクション → QA → リリース → 効果分析まで一気通貫。オフはレコードを掘り、DJ をしています。",
+      "フェーズも規模も違うプロダクトの成長局面に、一貫して関わってきました。UX設計や機能企画にとどまらず、アライアンス締結、資金決済法対応、ベンダー交渉による原価改善といった、事業企画として「裏側を作る」仕事も並行して担っています。SNSや匿名コミュニティのような、人の行動が表に出る場所を観察するのが習慣で、どこで迷い、どこで動くのか、その前後の文脈を読むのが得意です。これが体験設計の出発点になっています。個人ではAI（Midjourney や Runway など）でのビジュアル制作にも取り組んでいて、新しい技術を「自然に使える形」に落とすことへの関心は、仕事でも個人でも変わりません。",
     noPosts: "// まだ記事はありません — 近日公開",
     contactLead: ["一緒に、何かを", "つくりましょう", "。"],
     location: "東京, 日本",
